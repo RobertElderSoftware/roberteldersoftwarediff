@@ -1,0 +1,180 @@
+diff -Naur diffutils-3.6/lib/diffseq.h diffutils-3.6-new/lib/diffseq.h
+--- diffutils-3.6/lib/diffseq.h	2017-05-18 12:23:32.000000000 -0400
++++ diffutils-3.6-new/lib/diffseq.h	2017-05-31 10:59:36.905523276 -0400
+@@ -176,6 +176,17 @@
+    If we return the "wrong" partitions, the worst this can do is cause
+    suboptimal diff output.  It cannot cause incorrect diff output.  */
+ 
++static int positive_modulo(int i, int dmin, int n) {
++    /*  Subtract dmin from the current k line number so that 
++        we don't end up trying to access memory areas before the
++        array when looking at smaller sub-areas that have smaller L
++        values.
++    */
++    int new_d = i - dmin;
++    int r = ((new_d + n/2) % n);
++    return r;
++}
++
+ static void
+ diag (OFFSET xoff, OFFSET xlim, OFFSET yoff, OFFSET ylim, bool find_minimal,
+       struct partition *part, struct context *ctxt)
+@@ -201,29 +212,35 @@
+   bool odd = (fmid - bmid) & 1; /* True if southeast corner is on an odd
+                                    diagonal with respect to the northwest. */
+ 
+-  fd[fmid] = xoff;
+-  bd[bmid] = xlim;
++  OFFSET N = xlim - xoff;
++  OFFSET M = ylim - yoff;
++  OFFSET L = (2 * (N < M ? N : M) + 4);
++  fd[positive_modulo(fmid, dmin, L)] = xoff;
++  bd[positive_modulo(bmid, dmin, L)] = xlim;
++
++
+ 
+   for (c = 1;; ++c)
+     {
+       OFFSET d;                 /* Active diagonal. */
+       bool big_snake = false;
+ 
++      OFFSET overshoot_x = c-N;
++      OFFSET overshoot_y = c-M;
++      OFFSET k_line_adjustment_x = 2 * (0 > overshoot_x ? 0 : overshoot_x);
++      OFFSET k_line_adjustment_y = 2 * (0 > overshoot_y ? 0 : overshoot_y);
++      fmin = fmid - (c - k_line_adjustment_y);
++      fmax = fmid + (c - k_line_adjustment_x);
++      bmin = bmid - (c - k_line_adjustment_x);
++      bmax = bmid + (c - k_line_adjustment_y);
++
+       /* Extend the top-down search by an edit step in each diagonal. */
+-      if (fmin > dmin)
+-        fd[--fmin - 1] = -1;
+-      else
+-        ++fmin;
+-      if (fmax < dmax)
+-        fd[++fmax + 1] = -1;
+-      else
+-        --fmax;
+       for (d = fmax; d >= fmin; d -= 2)
+         {
+           OFFSET x;
+           OFFSET y;
+-          OFFSET tlo = fd[d - 1];
+-          OFFSET thi = fd[d + 1];
++          OFFSET tlo = d == fmin ? -1 : fd[positive_modulo(d - 1, dmin, L)];
++          OFFSET thi = d == fmax ? -1 : fd[positive_modulo(d + 1, dmin, L)];
+           OFFSET x0 = tlo < thi ? thi : tlo + 1;
+ 
+           for (x = x0, y = x0 - d;
+@@ -232,8 +249,8 @@
+             continue;
+           if (x - x0 > SNAKE_LIMIT)
+             big_snake = true;
+-          fd[d] = x;
+-          if (odd && bmin <= d && d <= bmax && bd[d] <= x)
++          fd[positive_modulo(d, dmin, L)] = x;
++          if (odd && bmin <= d && d <= bmax && bd[positive_modulo(d, dmin, L)] <= x)
+             {
+               part->xmid = x;
+               part->ymid = y;
+@@ -243,20 +260,12 @@
+         }
+ 
+       /* Similarly extend the bottom-up search.  */
+-      if (bmin > dmin)
+-        bd[--bmin - 1] = OFFSET_MAX;
+-      else
+-        ++bmin;
+-      if (bmax < dmax)
+-        bd[++bmax + 1] = OFFSET_MAX;
+-      else
+-        --bmax;
+       for (d = bmax; d >= bmin; d -= 2)
+         {
+           OFFSET x;
+           OFFSET y;
+-          OFFSET tlo = bd[d - 1];
+-          OFFSET thi = bd[d + 1];
++          OFFSET tlo = d == bmin ? OFFSET_MAX : bd[positive_modulo(d - 1, dmin, L)];
++          OFFSET thi = d == bmax ? OFFSET_MAX : bd[positive_modulo(d + 1, dmin, L)];
+           OFFSET x0 = tlo < thi ? tlo : thi - 1;
+ 
+           for (x = x0, y = x0 - d;
+@@ -265,8 +274,8 @@
+             continue;
+           if (x0 - x > SNAKE_LIMIT)
+             big_snake = true;
+-          bd[d] = x;
+-          if (!odd && fmin <= d && d <= fmax && x <= fd[d])
++          bd[positive_modulo(d, dmin, L)] = x;
++          if (!odd && fmin <= d && d <= fmax && x <= fd[positive_modulo(d, dmin, L)])
+             {
+               part->xmid = x;
+               part->ymid = y;
+@@ -295,7 +304,7 @@
+             for (d = fmax; d >= fmin; d -= 2)
+               {
+                 OFFSET dd = d - fmid;
+-                OFFSET x = fd[d];
++                OFFSET x = fd[positive_modulo(d, dmin, L)];
+                 OFFSET y = x - d;
+                 OFFSET v = (x - xoff) * 2 - dd;
+ 
+@@ -334,7 +343,7 @@
+             for (d = bmax; d >= bmin; d -= 2)
+               {
+                 OFFSET dd = d - bmid;
+-                OFFSET x = bd[d];
++                OFFSET x = bd[positive_modulo(d, dmin, L)];
+                 OFFSET y = x - d;
+                 OFFSET v = (xlim - x) * 2 + dd;
+ 
+@@ -382,7 +391,7 @@
+           fxybest = -1;
+           for (d = fmax; d >= fmin; d -= 2)
+             {
+-              OFFSET x = MIN (fd[d], xlim);
++              OFFSET x = MIN (fd[positive_modulo(d, dmin, L)], xlim);
+               OFFSET y = x - d;
+               if (ylim < y)
+                 {
+@@ -400,7 +409,7 @@
+           bxybest = OFFSET_MAX;
+           for (d = bmax; d >= bmin; d -= 2)
+             {
+-              OFFSET x = MAX (xoff, bd[d]);
++              OFFSET x = MAX (xoff, bd[positive_modulo(d, dmin, L)]);
+               OFFSET y = x - d;
+               if (y < yoff)
+                 {
+diff -Naur diffutils-3.6/src/analyze.c diffutils-3.6-new/src/analyze.c
+--- diffutils-3.6/src/analyze.c	2017-01-01 06:22:36.000000000 -0500
++++ diffutils-3.6-new/src/analyze.c	2017-05-31 10:59:31.265546514 -0400
+@@ -557,12 +557,13 @@
+ 
+       ctxt.xvec = cmp->file[0].undiscarded;
+       ctxt.yvec = cmp->file[1].undiscarded;
+-      diags = (cmp->file[0].nondiscarded_lines
+-	       + cmp->file[1].nondiscarded_lines + 3);
++      diags = 2* (
++          cmp->file[0].nondiscarded_lines < cmp->file[1].nondiscarded_lines ?
++	       cmp->file[0].nondiscarded_lines :
++	       cmp->file[1].nondiscarded_lines
++      ) + 4;
+       ctxt.fdiag = xmalloc (diags * (2 * sizeof *ctxt.fdiag));
+       ctxt.bdiag = ctxt.fdiag + diags;
+-      ctxt.fdiag += cmp->file[1].nondiscarded_lines + 1;
+-      ctxt.bdiag += cmp->file[1].nondiscarded_lines + 1;
+ 
+       ctxt.heuristic = speed_large_files;
+ 
+@@ -580,7 +581,7 @@
+       compareseq (0, cmp->file[0].nondiscarded_lines,
+ 		  0, cmp->file[1].nondiscarded_lines, minimal, &ctxt);
+ 
+-      free (ctxt.fdiag - (cmp->file[1].nondiscarded_lines + 1));
++      free (ctxt.fdiag);
+ 
+       /* Modify the results slightly to make them prettier
+ 	 in cases where that can validly be done.  */
