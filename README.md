@@ -1,6 +1,7 @@
 #  CONTRIBUTING
 
 ![alt text](http://recc.robertelder.org/fire.gif "Fire") DO NOT CREATE PULL REQUESTS FOR THIS PROJECT.  ![alt text](http://recc.robertelder.org/fire.gif "Fire")
+
 ![alt text](http://recc.robertelder.org/fire.gif "Fire") ANY PULL REQUESTS YOU CREATE WILL NOT BE MERGED IN. ![alt text](http://recc.robertelder.org/fire.gif "Fire")
 
 Contributing to this project is not currently permitted.
@@ -12,9 +13,17 @@ Having said this, don't let the warning above prevent you from filing issues if 
 This repository contains several different bodies of work related to calculating differences in sequences:
 
 -  roberteldersoftwarediff.py:  A terminal based diff tool with support for unicode and a few other encodings.
+
+| --- | --- |
+| ![alt text](images/powershell-win10.png "Powershell Windows 10") | ![alt text](images/ubuntu-standard.png "Ubuntu 16 gnome-terminal") |
+| ![alt text](images/cmd-exe-winxp.png "cmd.exe Windows XP") | ![alt text](images/linux-vt-fbterm.png "Linux VT fbterm")  |
+
+
 -  myers_diff_and_variations.py:  A collection of variants of the myers diff algorithm and associated algorithms.
-![alt text](blog.png "Blog Explanation")
+
+![alt text](images/blog.png "Blog Explanation")
 -  diffutils-3.6-myers-optimization.patch:  An experimental path for Unix diffutils that is asymptotically faster for some large input sizes when calculating a minimal difference.  See also: http://blog.robertelder.org/diff-algorithm/
+
 
 
 #  ROBERTELDERSOFTWAREDIFF.PY
@@ -155,317 +164,282 @@ Then run 'fbterm' to change the console into a mode that can now display unicode
 
 #  ROBERTELDERSOFTWAREDIFF.PY COMMAND LINE ARGUMENTS
 
-Mandatory positional arguments:
+## Mandatory Positional Arguments:
 
-  oldfile               File name of old version.
+##  oldfile
 
-  newfile               File name of new version.
+File name of old version.
 
-### Example
+##  newfile
+
+File name of new version.
+
+###### Example
 ```
 roberteldersoftwarediff a.txt b.txt
 ```
 
-optional arguments:
+## Optional Arguments:
 
-  -h, --help            Show a help message and exits.
+##  -h, --help
 
-### Example
+Show a help message and exits.
+
+###### Example
 ```
 roberteldersoftwarediff -h
 ```
 
-```
-  -i, --infinite-context
-```
-                        Showing infinite context before and after edits. This
-                        is often useful if you want to quickly see a hex dump
-                        of a file by diffing it with itself, and then using -i
-                        to see the entire context since there are no
-                        differences.
+##  -i, --infinite-context
 
-### Example
+Showing infinite context before and after edits. This is often useful if you want to quickly see a hex dump of a file by diffing it with itself, and then using -i to see the entire context since there are no differences.
+
+###### Example
 ```
 roberteldersoftwarediff -h
 ```
 
-```
-  -t LINES_CONTEXT, --lines-context LINES_CONTEXT
-```
-                        Number of lines of context to display before and
-                        after.
-### Example
+##  -t LINES_CONTEXT, --lines-context LINES_CONTEXT
+
+Number of lines of context to display before and after.
+
+###### Example
 ```
 roberteldersoftwarediff a.txt b.txt -t 5
 ```
 
 
-```
-  -w MAX_LINE_LENGTH, --max-line-length MAX_LINE_LENGTH
-```
-                        Chop up lines as if they were multiple lines when they
-                        exceed N characters.  Note that you will probably want to set --delimiters to be an empty array if you use this option, otherwise lines will also be split up using the default delimiter too.
+##  -w MAX_LINE_LENGTH, --max-line-length MAX_LINE_LENGTH
 
-### Example
+Chop up lines as if they were multiple lines when they exceed N characters.  Note that you will probably want to set --delimiters to be an empty array if you use this option, otherwise lines will also be split up using the default delimiter too.
+
+###### Example
 ```
 roberteldersoftwarediff a.txt b.txt --delimiters -w 20 
 ```
 
-```
-  --oldfile-message OLDFILE_MESSAGE
-```
-                        Message to display over old file.
-### Example
+##  --oldfile-message OLDFILE_MESSAGE
+
+Message to display over old file.
+
+###### Example
 ```
 roberteldersoftwarediff a.txt b.txt --oldfile-message "This is the old version."
 ```
 
 
-```
-  --newfile-message NEWFILE_MESSAGE
-```
-                        Message to display over new file.
-### Example
+##  --newfile-message NEWFILE_MESSAGE
+
+Message to display over new file.
+
+###### Example
 ```
 roberteldersoftwarediff a.txt b.txt --oldfile-message "This is the new version."
 ```
 
 
-```
-  --disable-header      
-```
-                        Disable header that labels the two files using oldfile message and newfile message.
-### Example
+##  --disable-header      
+
+Disable header that labels the two files using oldfile message and newfile message.
+
+###### Example
 ```
 roberteldersoftwarediff a.txt b.txt --disable-header
 ```
 
 
-```
-  --enable-ansi         
-```
-                        Explicitly attempt to disable ANSI color control sequences.
-### Example
+##  --enable-ansi         
+
+Explicitly attempt to disable ANSI color control sequences.
+
+###### Example
 ```
 roberteldersoftwarediff a.txt b.txt --enable-ansi
 ```
 
 
-```
-  --disable-ansi        
-```
-                        Explicitly attempt to enable ANSI color control sequences.
+##  --disable-ansi        
 
-### Example
+Explicitly attempt to enable ANSI color control sequences.
+
+###### Example
 ```
 roberteldersoftwarediff a.txt b.txt --disable-ansi
 ```
 
-```
-  --enable-windows-terminal-colours
-```
-                        Explicitly attempt to enable Windows colour setting
-                        calls.
+##  --enable-windows-terminal-colours
 
-### Example
+Explicitly attempt to enable Windows colour setting calls.
+
+###### Example
 ```
 roberteldersoftwarediff a.txt b.txt --enable-windows-terminal-colours
 ```
 
 
-```
-  --disable-windows-terminal-colours
-```
-                        Explicitly attempt to disable Windows colour setting
-                        calls.
+##  --disable-windows-terminal-colours
 
-### Example
+Explicitly attempt to disable Windows colour setting calls.
+
+###### Example
 ```
 roberteldersoftwarediff a.txt b.txt --disable-windows-terminal-colours
 ```
 
-```
-  --enable-mark         
-```
-                        Enable a marking symbols on the left-hand side that displays a check mark mark or x.
+##  --enable-mark         
+
+Enable a marking symbols on the left-hand side that displays a check mark mark or x.
 
 
-### Example
+###### Example
 ```
 roberteldersoftwarediff a.txt b.txt --enable-mark
 ```
 
-```
-  --disable-line-numbers
-```
-                        Disable line numbers.
-### Example
+##  --disable-line-numbers
+
+Disable line numbers.
+
+###### Example
 ```
 roberteldersoftwarediff a.txt b.txt --disable-line-numbers
 ```
 
 
-```
-  --disable-colours     
-```
-                        Disable any form of colour output.
+##  --disable-colours     
 
-### Example
+Disable any form of colour output.
+
+###### Example
 ```
 roberteldersoftwarediff a.txt b.txt --disable-colours
 ```
 
-```
-  -k, --include-delimiters
-```
-                        Include delimiters in the diff
+##   -k, --include-delimiters
 
-### Example
+Include delimiters in the diff
+
+###### Example
 ```
 roberteldersoftwarediff a.csv b.csv --delimiters "\n" "," -k
 ```
 
+##  --show-byte-offsets   
 
-```
-  --show-byte-offsets   
-```
+Show byte offsets instead of line numbers.
 
-### Example
+###### Example
 ```
 roberteldersoftwarediff a.txt b.txt --show-byte-offsets   
 ```
 
-                        Show byte offsets instead of line numbers.
 
-```
-  -d [DELIMITERS [DELIMITERS ...]], --delimiters [DELIMITERS [DELIMITERS ...]]
-```
-                        An optional list of delimiters to use in deciding when
-                        to split lines. By default if Windows is detected
-                        --delimiters will be "\r\n". If Linux is detected
-                        --delimiters will be "\n". If the platform detection
-                        isn't working properly, or if you want to diff a file
-                        from another platform, you can explicitly specify the
-                        line delimiters. If you specify --delimiters with
-                        nothing after it, this means that lines will never be
-                        split based on any character.
+##  -d [DELIMITERS [DELIMITERS ...]], --delimiters [DELIMITERS [DELIMITERS ...]]
+
+An optional list of delimiters to use in deciding when to split lines. By default if Windows is detected --delimiters will be "\r\n". If Linux is detected --delimiters will be "\n". If the platform detection isn't working properly, or if you want to diff a file from another platform, you can explicitly specify the line delimiters. If you specify --delimiters with nothing after it, this means that lines will never be split based on any character.
 
 
-### Example
+###### Example
 ```
 roberteldersoftwarediff a.txt b.txt --delimiters "Hi There" "\n" ";"
 ```
 
-```
-  -p [PUSH_DELIMITERS [PUSH_DELIMITERS ...]], --push-delimiters [PUSH_DELIMITERS [PUSH_DELIMITERS ...]]
-```
-                        Special delimiters used to indicate the start of a new
-                        line that should be intended.
-### Example
+##  -p [PUSH_DELIMITERS [PUSH_DELIMITERS ...]], --push-delimiters [PUSH_DELIMITERS [PUSH_DELIMITERS ...]]
+
+Special delimiters used to indicate the start of a new line that should be intended.
+
+###### Example
 ```
 roberteldersoftwarediff a.c b.c --push-delimiters "(" "{" --pop-delimiters ")" "}"
 ```
 
-```
-  -q [POP_DELIMITERS [POP_DELIMITERS ...]], --pop-delimiters [POP_DELIMITERS [POP_DELIMITERS ...]]
-```
-                        Special delimiters used to indicate the end of a line
-                        should have been intended.
+##  -q [POP_DELIMITERS [POP_DELIMITERS ...]], --pop-delimiters [POP_DELIMITERS [POP_DELIMITERS ...]]
 
-### Example
+Special delimiters used to indicate the end of a line should have been intended.
+
+###### Example
 ```
 roberteldersoftwarediff a.c b.c --push-delimiters "(" "{" --pop-delimiters ")" "}"
 ```
 
-```
-  -r PARAMETERS_ENCODING, --parameters-encoding PARAMETERS_ENCODING
-```
-                        The encoding to use when processing command-line
-                        parameters.
-### Example
+##  -r PARAMETERS_ENCODING, --parameters-encoding PARAMETERS_ENCODING
+
+The encoding to use when processing command-line parameters.
+###### Example
 ```
 roberteldersoftwarediff a.txt b.txt --parameters-encoding utf-8 --oldfile-message "日本国"  --output-encoding utf-8
 ```
 
-```
-  -o OUTPUT_ENCODING, --output-encoding OUTPUT_ENCODING
-```
-                        The encoding of the output.
+##  -o OUTPUT_ENCODING, --output-encoding OUTPUT_ENCODING
 
-### Example
+The encoding of the output.
+
+###### Example
 ```
 roberteldersoftwarediff a.txt b.txt --parameters-encoding utf-8 --oldfile-message "日本国"  --output-encoding utf-8
 ```
 
 
-```
-  -a OLDFILE_ENCODING, --oldfile-encoding OLDFILE_ENCODING
-```
-                        The encoding of oldfile.
+##  -a OLDFILE_ENCODING, --oldfile-encoding OLDFILE_ENCODING
 
-### Example
+The encoding of oldfile.
+
+###### Example
 ```
 roberteldersoftwarediff a.txt b.txt --oldfile-encoding utf-8 --newfile-encoding big5hkscs --output-encoding utf-8
 ```
 
-```
-  -b NEWFILE_ENCODING, --newfile-encoding NEWFILE_ENCODING
-```
-                        The encoding of newfile.
+##  -b NEWFILE_ENCODING, --newfile-encoding NEWFILE_ENCODING
 
-### Example
+The encoding of newfile.
+
+###### Example
 ```
 roberteldersoftwarediff a.txt b.txt --oldfile-encoding utf-8 --newfile-encoding big5hkscs --output-encoding utf-8
 ```
 
-```
-  -f OUTFILE, --outfile OUTFILE
-```
-                        Output to the specified file instead of stdout
+##  -f OUTFILE, --outfile OUTFILE
 
-### Example
+Output to the specified file instead of stdout
+
+###### Example
 ```
 roberteldersoftwarediff a.txt b.txt --outfile results
 ```
 
-```
-  --newline NEWLINE     
-```
-                        Optionally choose what character(s) to use when printing a new line of output. This is useful in some
-                        context where printing either "\n" or "\r\n" will
-                        result in extra blank lines. In some context, you may
-                        need to use --newline "" to avoid extra blank lines in
-                        the output.
+##  --newline NEWLINE     
 
-### Example
+Optionally choose what character(s) to use when printing a new line of output. This is useful in some context where printing either "\n" or "\r\n" will result in extra blank lines. In some context, you may need to use --newline "" to avoid extra blank lines in the output.
+
+###### Example
 ```
 roberteldersoftwarediff a.txt b.txt --newline "\r\n"
 ```
 
 
-```
-  -v, --verbose         
-```
-                        Be verbose.
-```
-  -e E                  
-```
-                        Set the encoding of oldfile, newfile, output, and parameters at the same time
+##  -v, --verbose         
 
-### Example
+Be verbose.
+
+###### Example
+```
+roberteldersoftwarediff a.txt b.txt --verbose
+```
+
+##  -e E                  
+
+Set the encoding of oldfile, newfile, output, and parameters at the same time
+
+###### Example
 ```
 roberteldersoftwarediff a.txt b.txt -e utf-8
 ```
 
-```
-  -m M                  
-```
-                        Equivalent to explicitly adding flags of the form: --push-delimiters PUSH_DELIMS --pop-delimiters
-                        POP_DELIMS --include-delimiters. For -m json, -m css,
-                        or -m js, PUSH_DELIMS, POP_DELIMS = "(" "{" "[", ")"
-                        "}" "]". For -m html: "(" "{" "[" "<", ")" "}" "]" ">".
+##  -m M                  
 
-### Example
+Equivalent to explicitly adding flags of the form: --push-delimiters PUSH_DELIMS --pop-delimiters POP_DELIMS --include-delimiters. For -m json, -m css, or -m js, PUSH_DELIMS, POP_DELIMS = "(" "{" "[", ")" "}" "]". For -m html: "(" "{" "[" "<", ")" "}" "]" ">".
+
+###### Example
 ```
 roberteldersoftwarediff a.html b.html -m html
 roberteldersoftwarediff a.json b.json -m json
@@ -475,27 +449,21 @@ roberteldersoftwarediff a.css b.css  -m css
 
 
 
-```
-  -x X                  
-```
-                        Display all bytes of the file in a pseudo-hex editor like format. Requires an integer argument to know how
-                        many bytes to display on each line. All output will be
-                        in standard ASCII. Equivalent to setting adding the
-                        following flags: --delimiters --show-byte-offsets
-                        --max-line. If you also explicitly set the output
-                        encoding will turn off hex encoding of characters.
+##  -x X                  
 
-### Example
+Display all bytes of the file in a pseudo-hex editor like format. Requires an integer argument to know how many bytes to display on each line. All output will be in standard ASCII. Equivalent to setting adding the following flags: --delimiters --show-byte-offsets --max-line. If you also explicitly set the output encoding will turn off hex encoding of characters.
+
+###### Example
 ```
 roberteldersoftwarediff a.out b.out -x 16
 ```
 
 
-```
-  --version             show program's version number and exit
-```
+##  --version
 
-### Example
+Show program's version number and exit
+
+###### Example
 ```
 roberteldersoftwarediff --version
 ```
