@@ -1,18 +1,17 @@
-#   Copyright 2017 Robert Elder Software Inc.
-#   
-#   Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-#   use this file except in compliance with the License.  You may obtain a copy 
-#   of the License at
-#   
-#       http://www.apache.org/licenses/LICENSE-2.0
-#   
-#   Unless required by applicable law or agreed to in writing, software 
-#   distributed under the License is distributed on an "AS IS" BASIS, WITHOUT 
-#   WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the 
-#   License for the specific language governing permissions and limitations 
-#   under the License.
+#  Copyright 2017 Robert Elder Software Inc.
+#  
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#  
+#      http://www.apache.org/licenses/LICENSE-2.0
+#  
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.import random
 
-import random
 import string
 import sys
 import os
@@ -30,7 +29,7 @@ not mentioned in the paper are also included here.
      in this document, and you just need to get back to work because it's already 7pm and you're still
      at the office, and you just want to get this stupid thing to work, why is there no easy answer on
      Stack Overflow that I can just copy and paste?  Oh man, I really need to stop doing this and  
-     start saying no to these crazy dealines.  I have so many friends that I need to get back to and haven't
+     start saying no to these crazy deadlines.  I have so many friends that I need to get back to and haven't
      spoken to in a while...  Maybe I'll just stay until most of my stock options vest, and then I'll
      quit.  This function has worst-case execution time of O(min(len(a),len(b)) * D), and requires
      2 * (2 * min(len(a),len(b))) space.
@@ -346,11 +345,12 @@ def shortest_edit_script(old_sequence, new_sequence):
     return shortest_edit_script_h(old_sequence, new_sequence, 0, 0);
 
 
-def measure_random_edit_script(old_sequence, new_sequence):
+def get_random_edit_script(old_sequence, new_sequence):
     """
     Used for testing.  The Myers algorithms should never produce an edit script
     that is longer than the random version.
     """
+    es = []
     N = len(old_sequence)
     M = len(new_sequence)
     x = 0
@@ -362,17 +362,21 @@ def measure_random_edit_script(old_sequence, new_sequence):
             y = y + 1
         if (x < N) and (y < M):
             if random.randint(0, 1):
+                es.append({"operation": "delete", "position_old": x})
                 x = x + 1
             else:
+                es.append({"operation": "insert", "position_old": x, "position_new": y})
                 y = y + 1
             D = D + 1
         elif x < N:
+            es.append({"operation": "delete", "position_old": x})
             x = x + 1
             D = D + 1
         elif y < M:
+            es.append({"operation": "insert", "position_old": x, "position_new": y})
             y = y + 1
             D = D + 1
-    return D
+    return es
 
 def myers_diff_length_minab_memory(old_sequence, new_sequence):
     """
@@ -758,13 +762,17 @@ def apply_edit_script(edit_script, s1, s2):
     i = 0
     for e in edit_script:
         while e["position_old"] > i:
-            new_sequence.append(s1[i])
+            if i < len(s1):
+                new_sequence.append(s1[i])
             i = i + 1
         if e["position_old"] == i:
             if e["operation"] == "delete":
                 i = i + 1
             elif e["operation"] == "insert":
                 new_sequence.append(s2[e["position_new"]])
+            elif e["operation"] == "change":
+                new_sequence.append(s2[e["position_new"]])
+                i = i + 1
         else:
             #  Should not happen
             raise 
@@ -773,6 +781,70 @@ def apply_edit_script(edit_script, s1, s2):
         new_sequence.append(s1[i])
         i = i + 1
     return new_sequence
+
+def get_parts_for_change_region(edit_script, i, ins, dels):
+    parts = []
+    #  This is the size of the 'changed' region.
+    square_size = min(len(ins), len(dels))
+    #  These are the inserts and deletes that have been paired up
+    for n in range(0, square_size):
+        parts.append({"operation": "change", "position_old": edit_script[dels[n]]["position_old"] ,"position_new": edit_script[ins[n]]["position_new"]})
+    #  These are the leftover inserts, that must be pushed 'square_size' units to the right.
+    for n in range(square_size, len(ins)):
+        m = edit_script[ins[n]]
+        #  Adjust the insertion positions so the offsets make sense in the simplified path.
+        shift_right = square_size - (m["position_old"] - edit_script[i]["position_old"])
+        p = {"operation": "insert", "position_old": m["position_old"] + shift_right, "position_new": m["position_new"]}
+        parts.append(p)
+
+    #  These are the leftover deletes.
+    for n in range(square_size, len(dels)):
+        m = edit_script[dels[n]]
+        parts.append(m)
+
+    return parts
+
+
+def simplify_edit_script(edit_script):
+    #  If we find a contiguous path composed of inserts and deletes, make them into 'changes' so they
+    #  can produce more visually pleasing diffs.
+    new_edit_script = []
+    m = len(edit_script)
+    i = 0
+    while i < m:
+        others = []
+        ins = []
+        dels = []
+        last_indx = edit_script[i]["position_old"]
+        #  Follow the path of inserts and deletes
+        while i + len(ins) + len(dels) < m:
+            indx = i + len(ins) + len(dels)
+            edit = edit_script[indx]
+            if edit["operation"] == "insert" and edit["position_old"] == last_indx:
+                last_indx = edit["position_old"]
+                ins.append(indx)
+            elif edit["operation"] == "delete" and edit["position_old"] == last_indx:
+                last_indx = edit["position_old"] + 1
+                dels.append(indx)
+            else:
+                if edit["operation"] == "insert" or edit["operation"] == "delete":
+                    pass #  Non-contiguous insert or delete.
+                else:  #  The current edit is something other than delete or insert, just add it...
+                    others.append(indx)
+                break
+        if len(ins) > 0 and len(dels) > 0:
+            #  Do simplify
+            new_edit_script.extend(get_parts_for_change_region(edit_script, i, ins, dels))
+        else:
+            #  Add the lone sequence of deletes or inserts
+            for r in range(0, len(dels)):
+                new_edit_script.append(edit_script[dels[r]])
+            for r in range(0, len(ins)):
+                new_edit_script.append(edit_script[ins[r]])
+        for r in range(0, len(others)):
+            new_edit_script.append(edit_script[others[r]])
+        i += len(ins) + len(dels) + len(others)
+    return new_edit_script
 
 def compare_sequences(s1, s2):
     if len(s1) == len(s2):
@@ -783,12 +855,16 @@ def compare_sequences(s1, s2):
     else:
         return False
 
-def print_edit_sequence(e, s1, s2):
+def print_edit_sequence(es, s1, s2):
     for e in es:
         if e["operation"] == "delete":
             print("Delete " + str(s1[e["position_old"]]) + " from s1 at position " + str(e["position_old"]) + " in s1.")
-        else:
+        elif e["operation"] == "insert":
             print("Insert " + str(s2[e["position_new"]]) + " from s2 before position " + str(e["position_old"]) + " into s1.")
+        elif e["operation"] == "change":
+            print("Change " + str(s1[e["position_old"]]) + " from s1 at position " + str(e["position_old"]) + " to be " + str(s2[e["position_new"]]) + " from s2.")
+        else:
+            raise
 
 def do_external_diff_test(s1, s2):
     echo1 = "echo -en '"+ ("\\\\n".join([str(i) for i in s1])) + "'"
@@ -805,16 +881,23 @@ def do_external_diff_test(s1, s2):
         assert(0)
 
 def do_test():
-    s1, s2 = make_random_sequences(random.randint(1,400))
+    s1, s2 = make_random_sequences(random.randint(1,300))
 
     print("Begin test with sequences a=" + str(s1) + " and b=" + str(s2) + "")
 
     #  Edit script
-    es = diff(s1, s2)
-    reconstructed_sequence = apply_edit_script(es, s1, s2)
+    minimal_edit_script = diff(s1, s2)
+    random_edit_script = get_random_edit_script(s1, s2)
+
+    reconstructed_minimal_sequence_basic = apply_edit_script(minimal_edit_script, s1, s2)
+    reconstructed_minimal_sequence_simple = apply_edit_script(simplify_edit_script(minimal_edit_script), s1, s2)
+
+    #  Random edit scripts encounter cases that the more optimal myers script don't
+    reconstructed_random_sequence_basic = apply_edit_script(random_edit_script, s1, s2)
+    reconstructed_random_sequence_simple = apply_edit_script(simplify_edit_script(random_edit_script), s1, s2)
 
     #  Pick out only the deletions
-    only_deletes = [item for item in es if not item["operation"] == "insert"]
+    only_deletes = [item for item in minimal_edit_script if not item["operation"] == "insert"]
     #  If we only apply the deletions to the original sequence, this should
     #  give us the longest common sub-sequence.
     reconstructed_lcs_sequence = apply_edit_script(only_deletes, s1, [])
@@ -827,8 +910,8 @@ def do_test():
     half_memory_distance = myers_diff_length_half_memory(s1, s2)
     minab_memory_distance = myers_diff_length_minab_memory(s1, s2)
     optimize_y_distance = myers_diff_length_optimize_y_variant(s1, s2)
-    random_distance = measure_random_edit_script(s1, s2)
-    edit_script_length = len(es)
+    random_distance = len(random_edit_script)
+    edit_script_length = len(minimal_edit_script)
     #  D = (M + N) + L
     computed_distance = (len(s1) + len(s2)) - (2 * (len(lcs)))
 
@@ -851,7 +934,10 @@ def do_test():
         optimal_distance == minab_memory_distance and
         optimal_distance == optimize_y_distance and
         random_distance >= optimal_distance and
-        compare_sequences(reconstructed_sequence, s2)
+        compare_sequences(reconstructed_minimal_sequence_basic, s2) and
+        compare_sequences(reconstructed_minimal_sequence_simple, s2) and
+        compare_sequences(reconstructed_random_sequence_basic, s2) and
+        compare_sequences(reconstructed_random_sequence_simple, s2)
     ):
         print("FAILURE!!!!")
         print("Sequences are a=" + str(s1) + " and b=" + str(s2) + "")
@@ -861,7 +947,10 @@ def do_test():
         print("min A,B memory D: " + str(minab_memory_distance))
         print("Optimize y D: " + str(optimize_y_distance))
         print("random D: " + str(random_distance))
-        print("reconstructed_sequence: " + str(reconstructed_sequence))
+        print("reconstructed_minimal_sequence_basic: " + str(reconstructed_minimal_sequence_basic))
+        print("reconstructed_minimal_sequence_simple: " + str(reconstructed_minimal_sequence_simple))
+        print("reconstructed_random_sequence_basic: " + str(reconstructed_random_sequence_basic))
+        print("reconstructed_random_sequence_simple: " + str(reconstructed_random_sequence_simple))
         print("edit_script_length: " + str(edit_script_length))
         print("Less memory Snake: D=" + str(D1) + " x1=" + str(x1) + " y1=" + str(y1) + " u1=" + str(u1) + " v1=" + str(v1))
         print("Myers original Snake: D=" + str(D2) + " x2=" + str(x2) + " y2=" + str(y2) + " u2=" + str(u2) + " v2=" + str(v2))
