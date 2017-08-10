@@ -14,14 +14,15 @@ This repository contains several different bodies of work related to calculating
 
 -  roberteldersoftwarediff.py:  A terminal based diff tool with support for unicode and a few other encodings.
 
-| --- | --- |
-| ![alt text](images/powershell-win10.png "Powershell Windows 10") | ![alt text](images/ubuntu-standard.png "Ubuntu 16 gnome-terminal") |
-| ![alt text](images/cmd-exe-winxp.png "cmd.exe Windows XP") | ![alt text](images/linux-vt-fbterm.png "Linux VT fbterm")  |
+![Diff in Powershell Windows 10](images/powershell-win10.png "Diff in Powershell Windows 10") ![Diff in Ubuntu 16 gnome-terminal](images/ubuntu-standard.png "Diff in Ubuntu 16 gnome-terminal")
+
+![Diff in cmd.exe Windows XP](images/cmd-exe-winxp.png "Diff in cmd.exe Windows XP") ![Diff in Linux Console VT fbterm](images/linux-vt-fbterm.png "Diff in Linux Console VT fbterm")
 
 
 -  myers_diff_and_variations.py:  A collection of variants of the myers diff algorithm and associated algorithms.
 
 ![alt text](images/blog.png "Blog Explanation")
+
 -  diffutils-3.6-myers-optimization.patch:  An experimental path for Unix diffutils that is asymptotically faster for some large input sizes when calculating a minimal difference.  See also: http://blog.robertelder.org/diff-algorithm/
 
 
@@ -196,7 +197,7 @@ Showing infinite context before and after edits. This is often useful if you wan
 
 ###### Example
 ```
-roberteldersoftwarediff -h
+roberteldersoftwarediff a.txt b.txt -i
 ```
 
 ##  -t LINES_CONTEXT, --lines-context LINES_CONTEXT
@@ -234,7 +235,7 @@ Message to display over new file.
 
 ###### Example
 ```
-roberteldersoftwarediff a.txt b.txt --oldfile-message "This is the new version."
+roberteldersoftwarediff a.txt b.txt --newfile-message "This is the new version."
 ```
 
 

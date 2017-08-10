@@ -101,12 +101,12 @@ def make_unix_terminal_interface(rp):
         def as_unicode(self):
             rtn = u""
             #  Used for debugging
-            rtn += u"terminal_width: " + py23_str(self.terminal_width, self.rp.output_encoding, "internal") + self.rp.newline
-            rtn += u"num_colours_supported: " + py23_str(self.num_colours_supported, self.rp.output_encoding, "internal") + self.rp.newline
+            rtn += u"terminal_width: " + py23_str(self.terminal_width, self.rp.output_encoding, "internal") + self.rp.output_newline
+            rtn += u"num_colours_supported: " + py23_str(self.num_colours_supported, self.rp.output_encoding, "internal") + self.rp.output_newline
             return rtn
 
         def output_test(self):
-            nl = self.rp.newline
+            nl = self.rp.output_newline
             output_bytes(e_encode(u"Begin Unix Terminal Interface Test" + nl, self.rp.output_encoding, "internal"), self.rp)
             colours = [INSERTION_COLOUR, DELETION_COLOUR, CHANGE_COLOUR, CORRECT_COLOUR, INCORRECT_COLOUR]
             colours_n = [u"INSERTION_COLOUR", u"DELETION_COLOUR", u"CHANGE_COLOUR", u"CORRECT_COLOUR", u"INCORRECT_COLOUR"]
@@ -214,7 +214,7 @@ def make_windows_terminal_interface(rp):
                     windll.kernel32.SetConsoleTextAttribute(self.STD_OUTPUT_HANDLE, ctypes.c_ushort(self.csbi_wAttributes_original))
             
                 def as_unicode(self):
-                    nl = self.rp.newline
+                    nl = self.rp.output_newline
                     rtn = u""
                     #  Used for debugging
                     rtn += u"STD_INPUT_HANDLE_NUMBER: " + py23_str(self.STD_INPUT_HANDLE_NUMBER, self.rp.output_encoding, "internal") + nl
@@ -231,7 +231,7 @@ def make_windows_terminal_interface(rp):
                     return rtn
             
                 def output_test(self):
-                    nl = self.rp.newline
+                    nl = self.rp.output_newline
                     output_bytes(e_encode(u"Begin Windows Terminal Interface Test" + nl, self.rp.output_encoding, "internal"), self.rp)
                     colours = [INSERTION_COLOUR, DELETION_COLOUR, CHANGE_COLOUR, CORRECT_COLOUR, INCORRECT_COLOUR]
                     colours_n = [u"INSERTION_COLOUR", u"DELETION_COLOUR", u"CHANGE_COLOUR", u"CORRECT_COLOUR", u"INCORRECT_COLOUR"]
@@ -242,10 +242,10 @@ def make_windows_terminal_interface(rp):
                             output_bytes(e_encode(u"This text should be coloured with " + colours_n[i], self.rp.output_encoding, "internal"), self.rp)
                             sys.stdout.flush()
                             self.reset_terminal_colours()
-                            output_bytes(e_encode(self.rp.newline, self.rp.output_encoding, "internal"), self.rp)
+                            output_bytes(e_encode(self.rp.output_newline, self.rp.output_encoding, "internal"), self.rp)
                         out_c = u"W"
                         str_width = py23_str(self.terminal_width, self.rp.output_encoding, "internal")
-                        output_bytes(e_encode(u"The next line should exactly fill the terminal width with " + str_width + u" '" + out_c + u"' characters:" + self.rp.newline, self.rp.output_encoding, "internal"), self.rp)
+                        output_bytes(e_encode(u"The next line should exactly fill the terminal width with " + str_width + u" '" + out_c + u"' characters:" + self.rp.output_newline, self.rp.output_encoding, "internal"), self.rp)
                         if self.terminal_width is not None and self.terminal_width > 0:
                             for i in range(0, self.terminal_width):
                                 output_bytes(e_encode(out_c, self.rp.output_encoding, "internal"), self.rp)
@@ -564,7 +564,7 @@ def read_char(in_fileobj, file_encoding, rp, file_source, as_binary):
     except UnicodeError as e:
         src = e_decode(as_byte_string(file_source, rp.output_encoding, "internal"), rp.output_encoding, "internal")
         msg = e_decode(as_byte_string(str(e), rp.output_encoding, "internal"), rp.output_encoding, "internal")
-        output_bytes(e_encode(u"Fatal unicode error from " + src + u": " + msg + rp.newline, rp.output_encoding, "internal"), rp)
+        output_bytes(e_encode(u"Fatal unicode error from " + src + u": " + msg + rp.output_newline, rp.output_encoding, "internal"), rp)
         do_graceful_exit(rp, MISSING_BYTE_ORDER_MARKER_EXIT_CODE)
 
     if as_binary:
@@ -582,7 +582,7 @@ def read_char(in_fileobj, file_encoding, rp, file_source, as_binary):
 def do_file_open_fail_error(f, e, rp):
     fname = e_decode(as_byte_string(f, rp.output_encoding, "internal"), rp.output_encoding, "internal")
     msg = e_decode(as_byte_string(str(e), rp.output_encoding, "internal"), rp.output_encoding, "internal")
-    output_bytes(e_encode(u"Failed to open file " + fname + u": " + msg + rp.newline, rp.output_encoding, "internal"), rp)
+    output_bytes(e_encode(u"Failed to open file " + fname + u": " + msg + rp.output_newline, rp.output_encoding, "internal"), rp)
     do_graceful_exit(rp, FILE_OPEN_FAIL_ERROR_EXIT_CODE)
 
 def read_file_as_list(infile, rp, file_encoding, file_source, as_binary):
@@ -666,7 +666,7 @@ def get_terminal_width(rp, unix_terminal_interface, windows_terminal_interface):
                 return windows_terminal_interface.terminal_width
 
     #  Give up and assume 80 wide
-    msg = u"WARNING:  Unable to determine terminal width so defaulting to 80.  You can specify with --cols flag." + rp.newline
+    msg = u"WARNING:  Unable to determine terminal width so defaulting to 80.  You can specify with --cols flag." + rp.output_newline
     b = e_encode(msg, rp.output_encoding, "internal") 
     output_bytes(b, rp)
     default_width = 80
@@ -679,7 +679,7 @@ def validate_delimiters(delimiters, rp):
                 if delimiters[i]["delimiter"].find(delimiters[j]["delimiter"]) != -1:
                     d1 = e_decode(delimiters[i]["delimiter"], rp.parameters_encoding, "parameters")
                     d2 = e_decode(delimiters[j]["delimiter"], rp.parameters_encoding, "parameters")
-                    msg = u"ERROR:  The delimiter '" + d2 + u"' is a prefix of the delimiter '" + d1 + u"'.  This would cause the delimiter '" + d1 + u"' to never be matched." + rp.newline
+                    msg = u"ERROR:  The delimiter '" + d2 + u"' is a prefix of the delimiter '" + d1 + u"'.  This would cause the delimiter '" + d1 + u"' to never be matched." + rp.output_newline
                     b = e_encode(msg, rp.output_encoding, "internal") 
                     output_bytes(b, rp)
                     do_graceful_exit(rp, COMMON_PREFIX_ERROR_EXIT_CODE)
@@ -688,7 +688,8 @@ def validate_delimiters(delimiters, rp):
 class RunParameters(object):
     def __init__(self, args):
         self.one_indent = u"  "
-        self.newline = u"\r\n" if is_probably_on_windows() else u"\n"
+        self.input_newline = u"\r\n" if is_probably_on_windows() else u"\n"
+        self.output_newline = self.input_newline  #  Default to platform.  Will be everwitten later.
         self.uses_change = False
         self.uses_deletion = False
         self.uses_insertion = False
@@ -765,7 +766,7 @@ class RunParameters(object):
             param_as_unicode = e_decode(d, self.parameters_encoding, "parameters") if (type(d) == bytes and type(d) == str) else d
             bs = as_byte_string(param_as_unicode, self.parameters_encoding, "parameters")
             ed = as_byte_string(evaluate_escape_sequences(bs, self.parameters_encoding, "parameters"), self.parameters_encoding, "parameters")
-            self.newline = e_decode(ed, self.parameters_encoding, "parameters")
+            self.output_newline = e_decode(ed, self.parameters_encoding, "parameters")
 
         self.delimiters = []
         if args.delimiters is not None:
@@ -775,7 +776,7 @@ class RunParameters(object):
                 ed = as_byte_string(evaluate_escape_sequences(bs, self.parameters_encoding, "parameters"), self.parameters_encoding, "parameters")
                 self.delimiters.append({"delimiter": ed, "level_adjust": 0})
         else:
-            bs = as_byte_string(self.newline, self.output_encoding, "internal")
+            bs = as_byte_string(self.input_newline, self.output_encoding, "internal")
             self.delimiters.append({"delimiter": bs, "level_adjust": 0})
 
         if args.push_delimiters is not None:
@@ -881,33 +882,37 @@ class RunParameters(object):
             self.show_byte_offsets = True
 
 
+        if self.disable_colours:
+            self.use_windows_terminal_colours = False
+            self.use_ansi = False
+
         if args.verbose is not None and args.verbose == True:
             if self.windows_terminal_interface:
                 self.windows_terminal_interface.output_test()
                 output_bytes(e_encode(self.windows_terminal_interface.as_unicode(), self.output_encoding, "internal"), self)
             else:
-                output_bytes(e_encode(u"Windows terminal interface is None" + self.newline, self.output_encoding, "internal"), self)
+                output_bytes(e_encode(u"Windows terminal interface is None" + self.output_newline, self.output_encoding, "internal"), self)
 
             if self.unix_terminal_interface:
                 self.unix_terminal_interface.output_test()
                 output_bytes(e_encode(self.unix_terminal_interface.as_unicode(), self.output_encoding, "internal"), self)
             else:
-                output_bytes(e_encode(u"Unis terminal interface is None" + self.newline, self.output_encoding, "internal"), self)
+                output_bytes(e_encode(u"Unix terminal interface is None" + self.output_newline, self.output_encoding, "internal"), self)
 
             #  Dump all of the various params:
-            output_bytes(e_encode(u"Here are the final calculated runtime parameters that are about to be used:" + self.newline, self.output_encoding, "internal"), self)
-            output_bytes(e_encode(u"use_windows_terminal_colours: " + py23_str(self.use_windows_terminal_colours, self.output_encoding, "internal") + self.newline, self.output_encoding, "internal"), self)
-            output_bytes(e_encode(u"use_ansi: " + py23_str(self.use_ansi, self.output_encoding, "internal") + self.newline, self.output_encoding, "internal"), self)
-            output_bytes(e_encode(u"output_encoding: " + py23_str(self.output_encoding, self.output_encoding, "internal") + self.newline, self.output_encoding, "internal"), self)
-            output_bytes(e_encode(u"oldfile_encoding: " + py23_str(self.oldfile_encoding, self.output_encoding, "internal") + self.newline, self.output_encoding, "internal"), self)
-            output_bytes(e_encode(u"newfile_encoding: " + py23_str(self.newfile_encoding, self.output_encoding, "internal") + self.newline, self.output_encoding, "internal"), self)
-            output_bytes(e_encode(u"parameters_encoding: " + py23_str(self.parameters_encoding, self.output_encoding, "internal") + self.newline, self.output_encoding, "internal"), self)
-            output_bytes(e_encode(u"show_byte_offsets: " + py23_str(self.show_byte_offsets, self.output_encoding, "internal") + self.newline, self.output_encoding, "internal"), self)
-            output_bytes(e_encode(u"enable_mark: " + py23_str(self.enable_mark, self.output_encoding, "internal") + self.newline, self.output_encoding, "internal"), self)
-            output_bytes(e_encode(u"Total number of delimiters (includes push and pop): " + py23_str(str(len(self.delimiters)), self.output_encoding, "internal") + self.newline, self.output_encoding, "internal"), self)
+            output_bytes(e_encode(u"Here are the final calculated runtime parameters that are about to be used:" + self.output_newline, self.output_encoding, "internal"), self)
+            output_bytes(e_encode(u"use_windows_terminal_colours: " + py23_str(self.use_windows_terminal_colours, self.output_encoding, "internal") + self.output_newline, self.output_encoding, "internal"), self)
+            output_bytes(e_encode(u"use_ansi: " + py23_str(self.use_ansi, self.output_encoding, "internal") + self.output_newline, self.output_encoding, "internal"), self)
+            output_bytes(e_encode(u"output_encoding: " + py23_str(self.output_encoding, self.output_encoding, "internal") + self.output_newline, self.output_encoding, "internal"), self)
+            output_bytes(e_encode(u"oldfile_encoding: " + py23_str(self.oldfile_encoding, self.output_encoding, "internal") + self.output_newline, self.output_encoding, "internal"), self)
+            output_bytes(e_encode(u"newfile_encoding: " + py23_str(self.newfile_encoding, self.output_encoding, "internal") + self.output_newline, self.output_encoding, "internal"), self)
+            output_bytes(e_encode(u"parameters_encoding: " + py23_str(self.parameters_encoding, self.output_encoding, "internal") + self.output_newline, self.output_encoding, "internal"), self)
+            output_bytes(e_encode(u"show_byte_offsets: " + py23_str(self.show_byte_offsets, self.output_encoding, "internal") + self.output_newline, self.output_encoding, "internal"), self)
+            output_bytes(e_encode(u"enable_mark: " + py23_str(self.enable_mark, self.output_encoding, "internal") + self.output_newline, self.output_encoding, "internal"), self)
+            output_bytes(e_encode(u"Total number of delimiters (includes push and pop): " + py23_str(str(len(self.delimiters)), self.output_encoding, "internal") + self.output_newline, self.output_encoding, "internal"), self)
             for d in self.delimiters:
                 output_bytes(e_encode(u"    Level Adjust: " + py23_str(d["level_adjust"], self.output_encoding, "internal") + u" ", self.output_encoding, "internal"), self)
-                output_bytes(e_encode(u"Delimiter: " + py23_str(bytearray(d["delimiter"]), self.output_encoding, "internal") + self.newline, self.output_encoding, "internal"), self)
+                output_bytes(e_encode(u"Delimiter: " + py23_str(bytearray(d["delimiter"]), self.output_encoding, "internal") + self.output_newline, self.output_encoding, "internal"), self)
             #  TODO:  Rest of params.
 
 class DiffState(object):
@@ -1439,12 +1444,12 @@ def get_bg_colours(insertion, deletion, change):
 
 
 def do_max_line_length_error(rp):
-    msg = u"The specified max line length is " + e_decode(as_byte_string(str(rp.max_line_length), rp.output_encoding, "internal"), rp.output_encoding, "internal") + u" but it must be greater than 0! Exiting..." + rp.newline
+    msg = u"The specified max line length is " + e_decode(as_byte_string(str(rp.max_line_length), rp.output_encoding, "internal"), rp.output_encoding, "internal") + u" but it must be greater than 0! Exiting..." + rp.output_newline
     output_bytes(e_encode(msg, rp.output_encoding, "internal"), rp)
     do_graceful_exit(rp, INVALID_MAX_LINE_LENGTH_ERROR_EXIT_CODE)
 
 def do_terminal_width_error(rp):
-    msg = u"The terminal width is " + e_decode(as_byte_string(str(rp.terminal_width), rp.output_encoding, "internal"), rp.output_encoding, "internal") + u" and that is not enough space to print characters in the current line! Exiting..." + rp.newline
+    msg = u"The terminal width is " + e_decode(as_byte_string(str(rp.terminal_width), rp.output_encoding, "internal"), rp.output_encoding, "internal") + u" and that is not enough space to print characters in the current line! Exiting..." + rp.output_newline
     output_bytes(e_encode(msg, rp.output_encoding, "internal"), rp)
     do_graceful_exit(rp, TERMINAL_WIDTH_ERROR_EXIT_CODE)
 
@@ -1463,7 +1468,7 @@ def do_error_count_warnings(rp):
             count = e_decode(as_byte_string(str(str(err_counts[k]["count"])), rp.output_encoding, "internal"), rp.output_encoding, "internal")
             src = e_decode(as_byte_string(err_counts[k]["src"], rp.output_encoding, "internal"), rp.output_encoding, "internal")
             dst = e_decode(as_byte_string(err_counts[k]["dst"], rp.output_encoding, "internal"), rp.output_encoding, "internal")
-            msg = u"WARNING: " + count + u" encoding errors ignored while processing " + src + u" to " + dst + rp.newline
+            msg = u"WARNING: " + count + u" encoding errors ignored while processing " + src + u" to " + dst + rp.output_newline
             output_bytes(e_encode(msg, rp.output_encoding, "internal"), rp)
 
 def main():
@@ -1519,7 +1524,7 @@ def main():
     rendered_separator = coloured_text(diff_state.separator, [], rp, "internal")
     rendered_incorrect_symbol = coloured_text(diff_state.incorrect_symbol, [INCORRECT_COLOUR], rp, "internal")
     rendered_correct_symbol = coloured_text(diff_state.correct_symbol, [CORRECT_COLOUR], rp, "internal")
-    rendered_newline = coloured_text(rp.newline, [CORRECT_COLOUR], rp, "internal")
+    rendered_newline = coloured_text(rp.output_newline, [], rp, "internal")
     
     #  Print out all of the lines in the two files
     while True:
