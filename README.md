@@ -8,16 +8,19 @@ Contributing to this project is not currently permitted.
 
 Having said this, don't let the warning above prevent you from filing issues if you find something broken or undesirable.
 
-#  OVERVIEW
+#  BEAUTIFUL TERMINAL DIFFS, EVERYWHERE
 
-This repository contains several different bodies of work related to calculating differences in sequences:
+This repository contains several different bodies of work, include a terminal based diff tool:
 
 -  roberteldersoftwarediff.py:  A terminal based diff tool with support for unicode and a few other encodings.
 
-![Diff in Powershell Windows 10](images/powershell-win10.png "Diff in Powershell Windows 10") ![Diff in Ubuntu 16 gnome-terminal](images/ubuntu-standard.png "Diff in Ubuntu 16 gnome-terminal")
+![Diff in Powershell Windows 10](images/powershell-win10.png "Diff in Powershell Windows 10") | ![Diff in Ubuntu 16 gnome-terminal](images/ubuntu-standard.png "Diff in Ubuntu 16 gnome-terminal")
+:-------------------------:|:-------------------------:
+![Diff in cmd.exe Windows XP](images/cmd-exe-winxp.png "Diff in cmd.exe Windows XP") | ![Diff in Linux Console VT fbterm](images/linux-vt-fbterm.png "Diff in Linux Console VT fbterm")
 
-![Diff in cmd.exe Windows XP](images/cmd-exe-winxp.png "Diff in cmd.exe Windows XP") ![Diff in Linux Console VT fbterm](images/linux-vt-fbterm.png "Diff in Linux Console VT fbterm")
+#  Myers Diff Algorithms
 
+Also included are a number of variations of the Myers Diff Algorithm and related subsequence algorithms:
 
 -  myers_diff_and_variations.py:  A collection of variants of the myers diff algorithm and associated algorithms.
 
@@ -47,7 +50,7 @@ A primary objective of roberteldersoftwarediff.py is robustness and correctness 
 #  WHY WOULD YOU EVER WANT TO USE THIS?
 
 -  To diff minified css/json/javascript.
--  Mixed encoding diffs:  Diff a UTF-32 encoded file with big5hkscs encoded text.
+-  Mixed encoding diffs:  Diff a UTF-32 encoded file with big5hkscs encoded text, then output the result in UTF-8.
 -  Quickly check for tiny binary and text differences in mixed ASCII/binary content.
 -  To diff minified html.
 -  The diffs look better than those in of vimdiff in many cases.
@@ -60,19 +63,19 @@ A primary objective of roberteldersoftwarediff.py is robustness and correctness 
 
 -  For large files that have many differences, the current comparison algorithm is asymptotically much slower then Unix diff.  I can fix this, but I don't plan to work on it unless I see a couple people filing issues about it first.
 -  It's relatively new and it might contain lots of bugs.
--  This tool emphasizes being able to diff *Any* type of file (binary files, files with different encodings, diffs between encodings) in any terminal context on multiple platforms and environments.  If you're looking for a diff tool that is specifically optimized for presenting diffs of your source code changes, this probably isn't the best tool on the market right now, but it will still work.
+-  This tool emphasizes being able to diff *any* type of file (binary files, files with different encodings, diffs between encodings) in any terminal context on multiple platforms and environments.  If you're looking for a diff tool that is specifically optimized for presenting diffs of your source code changes, this probably isn't the best tool on the market right now, but it will still work.
 
 #  ROBERTELDERSOFTWAREDIFF.PY WINDOWS INSTALL NOTES
 
 There isn't really anything to install, but you will need to make sure that Python is installed on your system first.  Then, just take the 'roberteldersoftwarediff.py' file and put it wherever you want, then run it like this on Windows:
 
 ```
-C:\Python27\python.exe C:\Put The Path To The File Here\roberteldersoftwarediff.py file1 file2
+C:\Python27\python.exe C:\Put The Path To roberteldersoftwarediff Here\roberteldersoftwarediff.py file1 file2
 ```
 
 Note that 'C:\Python27\python.exe' above should be replaced with whatever the actual location of your python installation is, and 'Put The Path To The File Here' should be the location of your 'roberteldersoftwarediff.py' file.
 
-Typing out the 'C:\Python27\' and 'C:\Put The Path To The File Here\' part over and over again is annoying, and you can change it so you don't need to type this by setting the environment variables of your terminal so that it knows the location of Python and of roberteldersoftwarediff.py. Then, you'll only have to type this:
+Typing out the 'C:\Python27\' and 'C:\Put The Path To roberteldersoftwarediff Here\' part over and over again is annoying, and you can change it so you don't need to type this by setting the environment variables of your terminal so that it knows the location of Python and of roberteldersoftwarediff.py. Then, you'll only have to type this:
 
 ```
 python roberteldersoftwarediff.py file1 file2
@@ -92,11 +95,15 @@ You can temporarily set the path variable in cmd.exe so it can locate python lik
 set PATH=%PATH%;C:\Python27
 ```
 
+Once again, note that the 'Python27' has to *actually* be the path of your python installation.
+
 If you put your 'roberteldersoftwarediff.py' file on the desktop in Windows XP, you could then set its path variable like this:
 
 ```
 set PATH=%PATH%;C:\"Document and Settings"\robert\Desktop
 ```
+
+Here is a link that might help you figure all this out:
 
 [Running Python Script From Windows Command Line](https://stackoverflow.com/questions/4621255/how-do-i-run-a-python-program-in-the-command-prompt-in-windows-7)
 
@@ -119,7 +126,7 @@ chcp
 
 by itself to see what the currently active code page is.  By default it is usually 437, which displays a very limited number of characters.
 
-In addition, you will need to set the console font to one that can display these exotic characters. I have found 'Lucida Console' to be a fairly good chose that is available on most platforms.  Keep in mind that printing unicode characters is not well supported in general in Windows terminals, and I have encountered a number of rendering issues related to this.
+In addition, you will need to set the console font to one that can display these exotic characters. I have found 'Lucida Console' to be a fairly good chose that is available on most platforms.  Keep in mind that printing unicode characters is not well supported in general in Windows terminals, and I have encountered a number of rendering bugs on Windows that appear to be out of my control.
 
 Finally, depending on your version of Windows, you may need to install additional language packs or change your location or language settings in the control panel in order to actually see all of the various exotic language characters in your terminal.
 
