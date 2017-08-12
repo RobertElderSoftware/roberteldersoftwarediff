@@ -476,7 +476,14 @@ Show program's version number and exit
 roberteldersoftwarediff --version
 ```
 
-#  CAVEATS
+#  UNICODE ALIGNMENT ISSUES
+
+The most obvious case where this tool will look like its broken is in calculating the layout when attempting to display various exotic unicode characters (especially Asian).  In these cases, characters do not take up a single terminal column, (even with a monospaced font!) and this presents a great problem in calculating the layout to print because the exact width of the characters cannot be accurately determined in general.  Great pains have been taken to make this as accurate as possible, but even things like changing the current font can change how many columns wide a character is.  I have spent enough time attempting to develop work-arounds to this problem that I'm tempted to declare that it is not only an open problem, but an *impossible* problem.
+
+![alt text](images/alignment-issues.png "Allignment Issues")
+
+
+#  OTHER CAVEATS
 
 There are so many issues that can occur when printing unicode (and other character encodings) in terminal that it is an insurmountable task to document all of them.  Here are a few things to think about if you're not seeing characters display properly in the order of likely importance:
 
