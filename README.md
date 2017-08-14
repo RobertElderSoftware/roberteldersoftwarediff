@@ -10,7 +10,7 @@ Having said this, don't let the warning above prevent you from filing issues if 
 
 #  BEAUTIFUL TERMINAL DIFFS, EVERYWHERE
 
-This repository contains several different bodies of work, include a terminal based diff tool:
+This repository contains several different bodies of work, including a terminal based diff tool:
 
 -  roberteldersoftwarediff.py:  A terminal based diff tool with support for unicode and a few other encodings.
 

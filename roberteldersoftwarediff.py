@@ -676,9 +676,13 @@ def validate_delimiters(delimiters, rp):
     for i in range(0, len(delimiters)):
         for j in range(0, len(delimiters)):
             if i != j:
-                if delimiters[i]["delimiter"].find(delimiters[j]["delimiter"]) != -1:
+                if delimiters[i]["delimiter"].find(delimiters[j]["delimiter"]) == 0:
                     d1 = e_decode(delimiters[i]["delimiter"], rp.parameters_encoding, "parameters")
                     d2 = e_decode(delimiters[j]["delimiter"], rp.parameters_encoding, "parameters")
+                    d1 = e_encode(d1, "unicode-escape", "internal")
+                    d2 = e_encode(d2, "unicode-escape", "internal")
+                    d1 = e_decode(d1, "utf-8", "internal")
+                    d2 = e_decode(d2, "utf-8", "internal")
                     msg = u"ERROR:  The delimiter '" + d2 + u"' is a prefix of the delimiter '" + d1 + u"'.  This would cause the delimiter '" + d1 + u"' to never be matched." + rp.output_newline
                     b = e_encode(msg, rp.output_encoding, "internal") 
                     output_bytes(b, rp)
