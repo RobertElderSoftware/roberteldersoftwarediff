@@ -32,8 +32,7 @@ Also included are a number of variations of the Myers Diff Algorithm and related
 
 #  ROBERTELDERSOFTWAREDIFF.PY
 
-
-Also see ![Terminal Diff Tool](http://blog.robertelder.org/terminal-diff-tool/ "Terminal Diff Tool Documentation")
+Also see [Terminal Diff Tool Documentation](http://blog.robertelder.org/terminal-diff-tool/)
 
 'roberteldersoftwarediff' is a light-weight minimal-dependency terminal-based diff tool that is implemented in a single python file.  Its only dependences are implemented in the python standard library.  It works with python 2.7 and python 3.6.
 
