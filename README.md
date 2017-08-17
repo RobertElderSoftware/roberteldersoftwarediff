@@ -170,6 +170,14 @@ sudo apt-get install fbterm
 
 Then run 'fbterm' to change the console into a mode that can now display unicode characters.  You can check the man page for 'fbterm' which documents a number of options for changing things like the font size.
 
+##  Scrolling Up And Down
+
+It is likely that you'll want to be able to scroll up and down to look at the result of the diff like you would using vim diff.  You can accomplish the same thing by piping the result into 'less' with the -R flag to render the ANSI colour sequences:
+
+```
+roberteldersoftwarediff a.txt b.txt | less -R
+```
+
 #  ROBERTELDERSOFTWAREDIFF.PY COMMAND LINE ARGUMENTS
 
 ## Mandatory Positional Arguments:
