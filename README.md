@@ -1,8 +1,8 @@
 #  CONTRIBUTING
 
-![alt text](http://recc.robertelder.org/fire.gif "Fire") DO NOT CREATE PULL REQUESTS FOR THIS PROJECT.  ![alt text](http://recc.robertelder.org/fire.gif "Fire")
+![Fire](http://recc.robertelder.org/fire.gif "Fire") DO NOT CREATE PULL REQUESTS FOR THIS PROJECT.  ![Fire](http://recc.robertelder.org/fire.gif "Fire")
 
-![alt text](http://recc.robertelder.org/fire.gif "Fire") ANY PULL REQUESTS YOU CREATE WILL NOT BE MERGED IN. ![alt text](http://recc.robertelder.org/fire.gif "Fire")
+![Fire](http://recc.robertelder.org/fire.gif "Fire") ANY PULL REQUESTS YOU CREATE WILL NOT BE MERGED IN. ![Fire](http://recc.robertelder.org/fire.gif "Fire")
 
 Contributing to this project is not currently permitted.
 
@@ -24,13 +24,16 @@ Also included are a number of variations of the Myers Diff Algorithm and related
 
 -  myers_diff_and_variations.py:  A collection of variants of the myers diff algorithm and associated algorithms.
 
-![alt text](images/blog.png "Blog Explanation")
+![Myers Diff Algorithm](images/blog.png "Blog Explanation")
 
 -  diffutils-3.6-myers-optimization.patch:  An experimental path for Unix diffutils that is asymptotically faster for some large input sizes when calculating a minimal difference.  See also: http://blog.robertelder.org/diff-algorithm/
 
 
 
 #  ROBERTELDERSOFTWAREDIFF.PY
+
+
+Also see ![Terminal Diff Tool](http://blog.robertelder.org/terminal-diff-tool/ "Terminal Diff Tool Documentation")
 
 'roberteldersoftwarediff' is a light-weight minimal-dependency terminal-based diff tool that is implemented in a single python file.  Its only dependences are implemented in the python standard library.  It works with python 2.7 and python 3.6.
 
@@ -488,7 +491,7 @@ roberteldersoftwarediff --version
 
 The most obvious case where this tool will look like its broken is in calculating the layout when attempting to display various exotic unicode characters (especially Asian).  In these cases, characters do not take up a single terminal column, (even with a monospaced font!) and this presents a great problem in calculating the layout to print because the exact width of the characters cannot be accurately determined in general.  Great pains have been taken to make this as accurate as possible, but even things like changing the current font can change how many columns wide a character is.  I have spent enough time attempting to develop work-arounds to this problem that I'm tempted to declare that it is not only an open problem, but an *impossible* problem.
 
-![alt text](images/alignment-issues.png "Allignment Issues")
+![Alignment issues](images/alignment-issues.png "Allignment Issues")
 
 
 #  OTHER CAVEATS
